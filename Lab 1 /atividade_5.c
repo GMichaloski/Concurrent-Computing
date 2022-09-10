@@ -13,6 +13,8 @@ void *incrementaArray (void *arg) {
     printf("ID DA THREAD AQUI %d\n", idThread);
     for (int i = idThread; i<TAMANHOARRAY;i+=NTHREADS){
         arrayFinal[i] = arrayQualquer[i] * 1.1;
+        // printf("THREAD %d operou o valor %f\n", idThread, arrayFinal[i]);
+        printf("Operação número %d, de %d, feita pela THREAD %d\n", i,TAMANHOARRAY, idThread);
     }
     pthread_exit(NULL);
 }
@@ -49,4 +51,19 @@ int main (void * arg){
          printf("--ERRO: pthread_join() \n"); exit(-1); 
     } 
   }
+
+    int checadorDeArrays = 1;
+    for (int i = 0; i < TAMANHOARRAY; i++){
+        float valorDeChecagem = arrayQualquer[i] * 1.1;
+        if (valorDeChecagem - arrayFinal[i] >0.01){
+            checadorDeArrays = 0;
+        }
+    }
+
+    if (checadorDeArrays){
+        printf("TUDO CERTO!");
+    }
+    else {
+        printf("OS ARRAYS NÃO SÃO IGUAIS!");    
+    }
 }
