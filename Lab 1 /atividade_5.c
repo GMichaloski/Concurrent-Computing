@@ -13,8 +13,6 @@ void *incrementaArray (void *arg) {
     printf("ID DA THREAD AQUI %d\n", idThread);
     for (int i = idThread; i<TAMANHOARRAY;i+=NTHREADS){
         arrayFinal[i] = arrayQualquer[i] * 1.1;
-        // printf("THREAD %d operou o valor %f\n", idThread, arrayFinal[i]);
-        printf("Operação número %d feita pela THREAD %d\n", i, idThread);
     }
     pthread_exit(NULL);
 }
@@ -40,11 +38,15 @@ int main (void * arg){
 
     for (int thread = 0; thread < NTHREADS; thread++){
         tid_local[thread] = thread;
+        printf("Cria a thread %d \n", thread);
         if (pthread_create(&tid_sistema[thread], NULL, incrementaArray, (void*) &tid_local[thread])){
             printf("ERRO NA CRIAÇÃO DA THREAD %d 😔😔😔\n", thread);
         }
-        printf("Cria a thread %d \n", thread);
     }
 
-    return 0;
+    for (int thread=0; thread<NTHREADS; thread++) {
+    if (pthread_join(tid_sistema[thread], NULL)) {       // Espera todas as threads terminarem
+         printf("--ERRO: pthread_join() \n"); exit(-1); 
+    } 
+  }
 }
