@@ -2,95 +2,117 @@
 #include <stdlib.h>
 #include <pthread.h>
 
-int obtemMatrizBinario(FILE *arquivo, int *linhas, int *colunas, float *matriz)
-{
-    arquivo = fread(&linhas, sizeof(int), 1, arquivo); // Lê o arquivo binário e verifica a existência dos dados de dimensão da matriz
-    size_t ret = fread(linhas, sizeof(int), 1, arquivo);
-    if (!ret)
-    {
-        fprintf(stderr, "Erro de leitura das dimensoes da matriz arquivo \n");
-        return 3;
-    }
-    ret = fread(colunas, sizeof(int), 1, arquivo);
-    if (!ret)
-    {
-        fprintf(stderr, "Erro de leitura das dimensoes da matriz arquivo \n");
-        return 3;
-    }
-    int tam = (*linhas) * (*colunas); // calcula a qtde de elementos da matriz
-
-    // aloca memoria para a matriz
-    matriz = (float *)malloc(sizeof(float) * tam);
-    if (!matriz)
-    {
-        fprintf(stderr, "Erro de alocao da memoria da matriz\n");
-        return 3;
-    }
-
-    ret = fread(matriz, sizeof(float), tam, arquivo);
-    if (ret < tam)
-    {
-        fprintf(stderr, "Erro de leitura dos elementos da matriz\n");
-        return 4;
-    }
-}
-
 int main(int argc, char *argv[])
 {
 
     float *matrizA;
     float *matrizB;
     float *matrizFinal;
-    int linhas, colunas;
+    int linhasA, colunasA, linhasB, colunasB;
     long long int tam;
     FILE *arquivoEntradaA = fopen(argv[1], "rb");
     FILE *arquivoEntradaB = fopen(argv[2], "rb");
     FILE *arquivoSaida = fopen(argv[3], "wb");
+    size_t ret;
 
     if (argc < 2)
     { // Verifica se os parâmetros foram todos passados ao compilar o programa
-        fprintf(stderr, "INPUT INVÁLIDO!\n Por favor, digite %s <Arquivo de entrada> <Arquivo de saída>\n", argv[0]);
+        fprintf(stderr, "INPUT INVÁLIDO!\nPor favor, digite %s <Arquivo de entrada 1> <Arquivo de entrada 2> <Arquivo de saída>\n", argv[0]);
         return 1;
     }
 
     if (!arquivoEntradaA)
     { // Verifica se é possível abrir o arquivo indicado
-        fprintf(stderr, "Falha ao abrir o arquivo!\n");
+        fprintf(stderr, "Falha ao abrir o primeiro arquivo!\n");
         return 2;
     }
 
-    int descritorArquivo = fread(&linhas, sizeof(int), 1, arquivoEntradaA); // Lê o arquivo binário e verifica a existência dos dados de dimensão da matriz
-    if (!descritorArquivo)
-    {
-        fprintf(stderr, "Erro de abertura do arquivo\n"); // DÚVIDA AQUI IRMÃO
+    if (!arquivoEntradaB)
+    { // Verifica se é possível abrir o arquivo indicado
+        fprintf(stderr, "Falha ao abrir o segundo arquivo!\n");
+        return 2;
     }
 
-    tam = linhas * colunas;                         // Calculando a quantidade de elementos da matriz para
-    matrizA = (float *)malloc(sizeof(float) * tam); // alocar espaço corretamente
+    fread(&linhasA, sizeof(int), 1, arquivoEntradaA); // Obtendo a quantidade de linhas e colunas da primeira matriz
+    fread(&colunasA, sizeof(int), 1, arquivoEntradaA);
+
+    tam = colunasA * linhasA; // Calculando a quantidade de elementos da matriz para alocar espaço corretamente
+    matrizA = (float *)malloc(sizeof(float) * tam);
+    if (!matrizA)
+    {
+        fprintf(stderr, "Erro de alocao da memoria da primeira matriz\n");
+        return 3;
+    }
+
+    ret = fread(matrizA, sizeof(float), tam, arquivoEntradaA);
+    if (ret < tam)
+    {
+        fprintf(stderr, "Erro de leitura dos elementos da primeira matriz\n");
+        return 4;
+    }
+
+    fclose(arquivoEntradaA);
+
+    fread(&linhasB, sizeof(int), 1, arquivoEntradaB);
+    fread(&colunasB, sizeof(int), 1, arquivoEntradaB);
+
+    tam = colunasB * linhasB; // Calculando a quantidade de elementos da matriz para alocar espaço corretamente
     matrizB = (float *)malloc(sizeof(float) * tam);
+    if (!matrizB)
+    {
+        fprintf(stderr, "Erro de alocao da memoria da segunda matriz\n");
+        return 3;
+    }
+
+    ret = fread(matrizB, sizeof(float), tam, arquivoEntradaB);
+    if (ret < tam)
+    {
+        fprintf(stderr, "Erro de leitura dos elementos da segunda matriz\n");
+        return 4;
+    }
+
+    fclose(arquivoEntradaB);
+    tam = linhasA * colunasB;
     matrizFinal = (float *)malloc(sizeof(float) * tam);
 
-    if (matrizA == NULL || matrizB == NULL || matrizFinal == NULL)
+    if (!matrizFinal)
     {
-        printf("ERRO AO ALOCAR MEMÓRIA\n");
-        return 2;
-    }
-    // Representar a matriz. Vetor_Linha?
-    for (size_t i = 0; i < tam; i++)
-    {
-        // matriz[i] = 1;
+        fprintf(stderr, "Erro de alocao da memoria da matriz final\n");
+        return 3;
     }
 
-    for (size_t i = 0; i < linhas; i++)
+    for (size_t i = 0; i < linhasA; i++) // Lamentável usar um código em o(n³)
     {
-        for (size_t j = 0; j < colunas; j++)
+        for (size_t j = 0; j < colunasB; j++)
         {
-            matrizFinal[i * linhas + j];
+            int acc = 0; // Utiliza-se um acumulador para armazenar o valor do item multiplicado
+            for (size_t k = 0; k < linhasA; k++)
+            {
+                acc += matrizA[i * linhasA + k] * matrizB[k * linhasA + j]; // A matriz está sendo representada em um vetor único,
+            }                                                               // cuja lógica utilizada é a seguinte:
+            matrizFinal[i * linhasA + j] = acc;                             // vetor[linhaAtual * quantidadeDeLinhas + colunaAtual]
+            printf("%f ", matrizFinal[i * linhasA + j]);
         }
+        printf("\n");
     }
 
-    // PENSAR EM COMO ESCREVER A MATRIZ EM BINÁRIO
-    // SALVAR O ARQUIVO
+    // escreve numero de linhas e de colunas
+    fwrite(&linhasA, sizeof(int), 1, arquivoSaida);
+    fwrite(&colunasB, sizeof(int), 1, arquivoSaida);
+    // escreve os elementos da matriz
+    ret = fwrite(matrizFinal, sizeof(float), tam, arquivoSaida);
+    if (ret < tam)
+    {
+        fprintf(stderr, "Erro de escrita no  arquivo\n");
+        return 4;
+    }
+
+    // finaliza o uso das variaveis
+    fclose(arquivoSaida);
+    free(matrizA);
+    free(matrizB);
+    free(matrizFinal);
+
+    return 0;
     // NÃO ESQUECE DOS CONTADORES DE TEMPO
-    fclose(arquivoEntradaA);
 }
