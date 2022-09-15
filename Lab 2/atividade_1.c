@@ -1,9 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
+#include "time.h"
 
 int main(int argc, char *argv[])
 {
+    double inicializacao, processamento, finalizacao; // Variáveis de contagem de tempo
 
     float *matrizA;
     float *matrizB;
@@ -20,6 +22,8 @@ int main(int argc, char *argv[])
         fprintf(stderr, "INPUT INVÁLIDO!\nPor favor, digite %s <Arquivo de entrada 1> <Arquivo de entrada 2> <Arquivo de saída>\n", argv[0]);
         return 1;
     }
+
+    GET_TIME(inicializacao);
 
     if (!arquivoEntradaA)
     { // Verifica se é possível abrir o arquivo indicado
@@ -72,6 +76,9 @@ int main(int argc, char *argv[])
     }
 
     fclose(arquivoEntradaB);
+
+    GET_TIME(inicializacao);
+
     tam = linhasA * colunasB;
     matrizFinal = (float *)malloc(sizeof(float) * tam);
 
@@ -91,10 +98,10 @@ int main(int argc, char *argv[])
                 acc += matrizA[i * linhasA + k] * matrizB[k * linhasA + j]; // A matriz está sendo representada em um vetor único,
             }                                                               // cuja lógica utilizada é a seguinte:
             matrizFinal[i * linhasA + j] = acc;                             // vetor[linhaAtual * quantidadeDeLinhas + colunaAtual]
-            printf("%f ", matrizFinal[i * linhasA + j]);
         }
-        printf("\n");
     }
+
+    GET_TIME(processamento);
 
     // escreve numero de linhas e de colunas
     fwrite(&linhasA, sizeof(int), 1, arquivoSaida);
@@ -113,6 +120,9 @@ int main(int argc, char *argv[])
     free(matrizB);
     free(matrizFinal);
 
+    GET_TIME(finalizacao);
+
+    printf("Tomada de tempo de execução interna:\nInicialização: %f ms\nProcessamento: %f ms\nFinalização: %f ms\n", inicializacao, processamento, finalizacao);
+
     return 0;
-    // NÃO ESQUECE DOS CONTADORES DE TEMPO
 }
