@@ -5,7 +5,8 @@
 
 int main(int argc, char *argv[])
 {
-    double inicializacao, processamento, finalizacao; // Variáveis de contagem de tempo
+    double momentoInicializacao, momentoProcessamento, momentoFinalizacao; // Variáveis de contagem de tempo
+    double duracaoInic, duracaoProc, duracaoFinal;
 
     float *matrizA;
     float *matrizB;
@@ -17,13 +18,14 @@ int main(int argc, char *argv[])
     FILE *arquivoSaida = fopen(argv[3], "wb");
     size_t ret;
 
+    GET_TIME(momentoInicializacao);
+    duracaoInic = momentoInicializacao;
+
     if (argc < 2)
     { // Verifica se os parâmetros foram todos passados ao compilar o programa
         fprintf(stderr, "INPUT INVÁLIDO!\nPor favor, digite %s <Arquivo de entrada 1> <Arquivo de entrada 2> <Arquivo de saída>\n", argv[0]);
         return 1;
     }
-
-    GET_TIME(inicializacao);
 
     if (!arquivoEntradaA)
     { // Verifica se é possível abrir o arquivo indicado
@@ -77,7 +79,11 @@ int main(int argc, char *argv[])
 
     fclose(arquivoEntradaB);
 
-    GET_TIME(inicializacao);
+    GET_TIME(momentoInicializacao);
+    duracaoInic = momentoInicializacao - duracaoInic;
+
+    GET_TIME(momentoProcessamento);
+    duracaoProc = momentoProcessamento;
 
     tam = linhasA * colunasB;
     matrizFinal = (float *)malloc(sizeof(float) * tam);
@@ -101,7 +107,10 @@ int main(int argc, char *argv[])
         }
     }
 
-    GET_TIME(processamento);
+    GET_TIME(momentoProcessamento);
+    duracaoProc = momentoProcessamento - duracaoProc;
+    GET_TIME(momentoFinalizacao);
+    duracaoFinal = momentoFinalizacao;
 
     // escreve numero de linhas e de colunas
     fwrite(&linhasA, sizeof(int), 1, arquivoSaida);
@@ -120,9 +129,10 @@ int main(int argc, char *argv[])
     free(matrizB);
     free(matrizFinal);
 
-    GET_TIME(finalizacao);
+    GET_TIME(momentoFinalizacao);
+    duracaoFinal = momentoFinalizacao - duracaoFinal;
 
-    printf("Tomada de tempo de execução interna:\nInicialização: %f ms\nProcessamento: %f ms\nFinalização: %f ms\n", inicializacao, processamento, finalizacao);
+    printf("Tomada de tempo de execução interna:\nInicialização: %f ms\nProcessamento: %f ms\nFinalização: %f ms\n", duracaoInic, duracaoProc, duracaoFinal);
 
     return 0;
 }
