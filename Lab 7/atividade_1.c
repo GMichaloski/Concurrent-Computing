@@ -19,7 +19,7 @@ int Buffer[N];                  // espaco de dados compartilhados
 int count = 0, in = 0, out = 0; // variaveis de estado
 
 // variaveis para sincronizacao
-sem_t condtInserir, condtRetirar, condtAlterarContador; // semaforos para sincronizar a ordem de execucao das threads
+sem_t condtInserir, condtRetirar; // semaforos para sincronizar a ordem de execucao das threads
 
 // inicializa o buffer
 void IniciaBuffer(int n)
@@ -32,8 +32,6 @@ void IniciaBuffer(int n)
 // imprime o buffer
 void ImprimeBuffer(int n)
 {
-    // tipoDaFuncao:
-    // 1 -> Imprimir para
     int i;
     for (i = 0; i < n; i++)
         printf("%d ", Buffer[i]);
