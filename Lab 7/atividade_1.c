@@ -128,7 +128,6 @@ int main(void)
     // inicializa as variaveis de sincronizacao
     sem_init(&condtInserir, 0, 1);
     sem_init(&condtRetirar, 0, 0);
-    sem_init(&condtAlterarContador, 0, 1);
 
     // cria as threads produtoras
     for (i = 0; i < P; i++)
