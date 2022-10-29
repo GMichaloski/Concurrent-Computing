@@ -19,8 +19,7 @@ int Buffer[N];                  // espaco de dados compartilhados
 int count = 0, in = 0, out = 0; // variaveis de estado
 
 // variaveis para sincronizacao
-sem_t condtInserir, condtRetirar; // semaforos para sincronizar a ordem de execucao das threads
-pthread_mutex_t mutex;
+sem_t condtInserir, condtRetirar, condtAlterarContador; // semaforos para sincronizar a ordem de execucao das threads
 
 // inicializa o buffer
 void IniciaBuffer(int n)
@@ -33,10 +32,13 @@ void IniciaBuffer(int n)
 // imprime o buffer
 void ImprimeBuffer(int n)
 {
+    // tipoDaFuncao:
+    // 1 -> Imprimir para
     int i;
     for (i = 0; i < n; i++)
         printf("%d ", Buffer[i]);
     printf("\n");
+    sem_post(&condtRetirar);
 }
 
 // insere um elemento no Buffer ou bloqueia a thread caso o Buffer esteja cheio
@@ -51,7 +53,6 @@ void Insere(int item, int id)
     count += N;
     printf("P[%d] inseriu\n", id);
     ImprimeBuffer(N);
-    sem_post(&condtRetirar);
 }
 
 // retira um elemento no Buffer ou bloqueia a thread caso o Buffer esteja vazio
@@ -60,19 +61,17 @@ int Retira(int id)
     int item;
     printf("C[%d] quer consumir\n", id);
     sem_wait(&condtRetirar);
-    pthread_mutex_lock(&mutex);
     if (count == 0)
     {
         sem_post(&condtInserir);
+        sem_wait(&condtRetirar);
     }
     count--;
-    pthread_mutex_unlock(&mutex);
     item = Buffer[out];
     Buffer[out] = 0;
     out = (out + 1) % N;
     printf("C[%d] consumiu %d\n", id, item);
     ImprimeBuffer(N);
-    sem_post(&condtRetirar);
     return item;
 }
 
@@ -131,7 +130,7 @@ int main(void)
     // inicializa as variaveis de sincronizacao
     sem_init(&condtInserir, 0, 1);
     sem_init(&condtRetirar, 0, 0);
-    pthread_mutex_init(&mutex, NULL);
+    sem_init(&condtAlterarContador, 0, 1);
 
     // cria as threads produtoras
     for (i = 0; i < P; i++)
