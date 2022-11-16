@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <stdlib.h>
+// #include "time.h"
 
 float matriz[10][10], vetorResultados[10], vetorAuxiliar[10], vetorFinal[10], EPSILON = 0.00001, soma;
 
@@ -12,8 +13,12 @@ void geraMatrizResultados(int numeroVariaveis)
 {
 }
 
-void main()
+void main(int argc, char **argv)
 {
+    // double momentoInicializacao, momentoProcessamento, momentoFinalizacao, tempoInicializacao, tempoProcessamento, tempoFinalizacao;
+    // GET_TIME(momentoInicializacao);
+    // tempoInicializacao = momentoInicializacao;
+
     int numeroDeVariaveis, flag;
 
     printf("\nQuantas variáveis possui na equação?: ");
@@ -32,6 +37,12 @@ void main()
         scanf("%f", &vetorResultados[i]);
     for (int i = 0; i < numeroDeVariaveis; i++)
         vetorAuxiliar[i] = 0;
+
+    // GET_TIME(momentoInicializacao);
+    // tempoInicializacao = momentoInicializacao - tempoInicializacao;
+
+    // GET_TIME(momentoProcessamento);
+    // tempoProcessamento = momentoProcessamento;
 
     do
     {
@@ -53,7 +64,18 @@ void main()
 
     } while (flag == 1);
 
+    // GET_TIME(momentoProcessamento);
+    // tempoProcessamento = momentoProcessamento - tempoProcessamento;
+
+    // GET_TIME(momentoFinalizacao);
+    // tempoFinalizacao = momentoFinalizacao;
+
     printf("Solução: \n");
     for (int i = 0; i < numeroDeVariaveis; i++)
         printf("x%d: %8.5f \n", i + 1, vetorFinal[i]);
+
+    // GET_TIME(momentoFinalizacao);
+    // tempoFinalizacao = momentoFinalizacao - tempoFinalizacao;
+
+    // printf("Tempo de inicialização: %0.6f \nTempo de processamento: %0.6f \nTempo de finalização: %0.6f \n ", tempoInicializacao, tempoProcessamento, tempoFinalizacao);
 }

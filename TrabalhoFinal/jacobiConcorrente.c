@@ -2,6 +2,8 @@
 #include <math.h>
 #include <stdlib.h>
 #include <pthread.h>
+#include "time.h"
+
 /* Variaveis globais */
 int bloqueadas = 0, nthreads = 1, numeroDeVariaveis;
 pthread_mutex_t x_mutex;
@@ -28,7 +30,7 @@ void barreira(int nthreads)
 
 void *tarefaJacobi(void *arg)
 {
-    int id = *(int *)arg; // Identificação das threads
+    int id = (long int)arg; // Identificação das threads
     for (int i = id; i < numeroDeVariaveis; i += nthreads)
     {
         soma = vetorResultados[i];
@@ -42,6 +44,9 @@ void *tarefaJacobi(void *arg)
 
 void main(int argc, char **argv)
 {
+    double momentoInicializacao, momentoProcessamento, momentoFinalizacao, tempoInicializacao, tempoProcessamento, tempoFinalizacao;
+    GET_TIME(momentoInicializacao);
+    tempoInicializacao = momentoInicializacao;
     pthread_t *tid; // Identificadores das threads no sistema
     if (argc > 1)
     {
@@ -73,6 +78,12 @@ void main(int argc, char **argv)
         return;
     }
 
+    GET_TIME(momentoInicializacao);
+    tempoInicializacao = momentoInicializacao - tempoInicializacao;
+
+    GET_TIME(momentoProcessamento);
+    tempoProcessamento = momentoProcessamento;
+
     int flag; // Variável para calcular até quando o algoritmo deve iterar
     do
     {
@@ -102,7 +113,17 @@ void main(int argc, char **argv)
                 vetorAuxiliar[i] = vetorFinal[i];
 
     } while (flag == 1);
+
+    GET_TIME(momentoProcessamento);
+    tempoProcessamento = momentoProcessamento - tempoProcessamento;
+
+    GET_TIME(momentoFinalizacao);
+    tempoFinalizacao = momentoFinalizacao;
+
     printf("Solução: \n");
     for (int i = 0; i < numeroDeVariaveis; i++) // Imprime o valor das variáveis
         printf("x%d: %8.5f \n", i + 1, vetorFinal[i]);
+    GET_TIME(momentoFinalizacao);
+    tempoFinalizacao = momentoFinalizacao - tempoFinalizacao;
+    printf("Tempo de inicialização: %0.6f \nTempo de processamento: %0.6f \nTempo de finalização: %0.6f \n ", tempoInicializacao, tempoProcessamento, tempoFinalizacao);
 }
