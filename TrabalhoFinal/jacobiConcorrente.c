@@ -28,7 +28,7 @@ void barreira(int nthreads)
 
 void *tarefaJacobi(void *arg)
 {
-    int id = *(int *)arg;
+    int id = *(int *)arg; // Identificação das threads
     for (int i = id; i < numeroDeVariaveis; i += nthreads)
     {
         soma = vetorResultados[i];
@@ -42,10 +42,10 @@ void *tarefaJacobi(void *arg)
 
 void main(int argc, char **argv)
 {
-    pthread_t *tid; // identificadores das threads no sistema
+    pthread_t *tid; // Identificadores das threads no sistema
     if (argc > 1)
     {
-        nthreads = atoi(argv[1]);
+        nthreads = atoi(argv[1]); // Argumento que recebe a quantidade de threads que o programa utilizará
     }
 
     printf("PROGRAMA EXECUTANDO COM %d THREADS \n", nthreads);
@@ -73,7 +73,7 @@ void main(int argc, char **argv)
         return;
     }
 
-    int flag;
+    int flag; // Variável para calcular até quando o algoritmo deve iterar
     do
     {
         for (long int i = 0; i < nthreads; i++)
@@ -103,6 +103,6 @@ void main(int argc, char **argv)
 
     } while (flag == 1);
     printf("Solução: \n");
-    for (int i = 0; i < numeroDeVariaveis; i++)
+    for (int i = 0; i < numeroDeVariaveis; i++) // Imprime o valor das variáveis
         printf("x%d: %8.5f \n", i + 1, vetorFinal[i]);
 }
