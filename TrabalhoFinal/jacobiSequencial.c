@@ -5,14 +5,6 @@
 
 float matriz[10][10], vetorResultados[10], vetorAuxiliar[10], vetorFinal[10], EPSILON = 0.00001, soma;
 
-void geraEquacao(int numeroVariaveis)
-{
-}
-
-void geraMatrizResultados(int numeroVariaveis)
-{
-}
-
 void main(int argc, char **argv)
 {
     // double momentoInicializacao, momentoProcessamento, momentoFinalizacao, tempoInicializacao, tempoProcessamento, tempoFinalizacao;
@@ -54,12 +46,15 @@ void main(int argc, char **argv)
                     soma -= matriz[i][j] * vetorAuxiliar[j];
             vetorFinal[i] = soma / matriz[i][i];
         }
-        flag = 0;
+
+        flag = 1;
+
         for (int i = 0; i < numeroDeVariaveis; i++)
             if (fabs(vetorAuxiliar[i] - vetorFinal[i]) < EPSILON)
-                flag = 1;
+                flag = 0;
+
         if (flag == 1)
-            for (int i = 1; i < numeroDeVariaveis; i++)
+            for (int i = 0; i < numeroDeVariaveis; i++)
                 vetorAuxiliar[i] = vetorFinal[i];
 
     } while (flag == 1);

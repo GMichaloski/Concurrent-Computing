@@ -4,7 +4,7 @@
 #include <pthread.h>
 #include "time.h"
 
-#define QUANTIDADELINHAS 3 // tamanho do buffer
+#define QUANTIDADELINHAS 10000 // tamanho do buffer
 /* Variaveis globais */
 int bloqueadas = 0, nthreads = 1, numeroDeVariaveis = QUANTIDADELINHAS;
 pthread_mutex_t x_mutex;
@@ -49,6 +49,27 @@ void main(int argc, char **argv)
 {
     double momentoInicializacao, momentoProcessamento, momentoFinalizacao, tempoInicializacao, tempoProcessamento, tempoFinalizacao;
     GET_TIME(momentoInicializacao);
+
+    for (int i = 0; i <= numeroDeVariaveis; i++) // Gerando matriz aleatória
+    {
+        for (int j = 0; j < numeroDeVariaveis; j++)
+        {
+            matriz[i][j] = (rand() % 10) + 1;
+            if (i == j)
+            {
+                matriz[i][j] = (rand() % 10 + 1) * numeroDeVariaveis * 10;
+            }
+            // printf("%f\n", matriz[i][j]);
+        }
+        // printf("\n");
+    }
+    srand(time(NULL));
+    for (int i = 0; i < numeroDeVariaveis; i++)
+    {
+        vetorResultados[i] = (rand() % 10) + 1;
+        // printf("%f\n", vetorResultados[i]);
+    }
+
     tempoInicializacao = momentoInicializacao;
     pthread_t *tid; // Identificadores das threads no sistema
     if (argc > 1)
@@ -57,20 +78,7 @@ void main(int argc, char **argv)
     }
 
     printf("PROGRAMA EXECUTANDO COM %d THREADS \n", nthreads);
-    printf("\nQuantas variáveis possui na equação?: ");
-    scanf("%d", &numeroDeVariaveis);
 
-    printf("\nEntre com a matriz de equações: ");
-    for (int i = 0; i < numeroDeVariaveis; i++)
-    {
-        for (int j = 0; j < numeroDeVariaveis; j++)
-        {
-            scanf("%f", &matriz[i][j]);
-        }
-    }
-    printf("\nEntre com o vetor de resultados: ");
-    for (int i = 0; i < numeroDeVariaveis; i++)
-        scanf("%f", &vetorResultados[i]);
     for (int i = 0; i < numeroDeVariaveis; i++)
         vetorAuxiliar[i] = 0;
 
@@ -106,10 +114,10 @@ void main(int argc, char **argv)
                 exit(-1);
             }
         }
-        for (int i = 0; i < numeroDeVariaveis; i++)
-            printf("%8.5f ", vetorFinal[i]);
-        printf("\n");
-        flag = 1;
+        // for (int i = 0; i < numeroDeVariaveis; i++)
+        //     printf("%8.5f ", vetorFinal[i]);
+        // printf("\n");
+        // flag = 1;
 
         for (int i = 0; i < numeroDeVariaveis; i++)
             if (fabs(vetorAuxiliar[i] - vetorFinal[i]) < EPSILON)
