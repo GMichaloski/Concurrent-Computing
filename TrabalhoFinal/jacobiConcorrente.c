@@ -4,11 +4,12 @@
 #include <pthread.h>
 #include "time.h"
 
+#define QUANTIDADELINHAS 2 // tamanho do buffer
 /* Variaveis globais */
-int bloqueadas = 0, nthreads = 1, numeroDeVariaveis;
+int bloqueadas = 0, nthreads = 1, numeroDeVariaveis = QUANTIDADELINHAS;
 pthread_mutex_t x_mutex;
 pthread_cond_t x_cond;
-float matriz[10][10], vetorResultados[10], vetorAuxiliar[10], vetorFinal[10], EPSILON = 0.00001, soma;
+float matriz[QUANTIDADELINHAS][QUANTIDADELINHAS], vetorResultados[QUANTIDADELINHAS], vetorAuxiliar[QUANTIDADELINHAS], vetorFinal[QUANTIDADELINHAS], EPSILON = 0.00001;
 
 // Função barreira vista em aula
 void barreira(int nthreads)
@@ -33,7 +34,7 @@ void *tarefaJacobi(void *arg)
     int id = (long int)arg; // Identificação das threads
     for (int i = id; i < numeroDeVariaveis; i += nthreads)
     {
-        soma = vetorResultados[i];
+        int soma = vetorResultados[i];
         for (int j = 0; j < numeroDeVariaveis; j++)
             if (j != i)
                 soma -= matriz[i][j] * vetorAuxiliar[j];
