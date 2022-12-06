@@ -4,7 +4,7 @@
 #include <pthread.h>
 #include "time.h"
 
-#define QUANTIDADELINHAS 10000 // tamanho do buffer
+#define QUANTIDADELINHAS 20000 // tamanho do buffer
 /* Variaveis globais */
 int bloqueadas = 0, nthreads = 1, numeroDeVariaveis = QUANTIDADELINHAS;
 pthread_mutex_t x_mutex;
@@ -50,7 +50,7 @@ void main(int argc, char **argv)
     double momentoInicializacao, momentoProcessamento, momentoFinalizacao, tempoInicializacao, tempoProcessamento, tempoFinalizacao;
     GET_TIME(momentoInicializacao);
 
-    for (int i = 0; i <= numeroDeVariaveis; i++) // Gerando matriz aleatória
+    for (int i = 0; i < numeroDeVariaveis; i++) // Gerando matriz aleatória
     {
         for (int j = 0; j < numeroDeVariaveis; j++)
         {
